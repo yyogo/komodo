@@ -187,6 +187,10 @@ function HoldConfirmModal({
 
   const holding = startedAtRef.current !== null;
   const countdown = Math.max(0, Math.ceil(remainingMs / 1_000));
+  const progress = holding
+    ? Math.min(100, Math.max(0, ((durationMs - remainingMs) / durationMs) * 100))
+    : 0;
+  const progressStop = `${progress}%`;
 
   return (
     <>
@@ -238,7 +242,14 @@ function HoldConfirmModal({
               onKeyDown={handleKeyDown}
               onKeyUp={handleKeyUp}
               onBlur={cancelHold}
-              style={{ touchAction: "none", userSelect: "none" }}
+              style={[
+                confirmProps?.style,
+                {
+                  touchAction: "none",
+                  userSelect: "none",
+                  backgroundImage: `linear-gradient(90deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.24) ${progressStop}, transparent ${progressStop}, transparent 100%)`,
+                },
+              ]}
               aria-label={`Hold for ${durationMs / 1_000} seconds to confirm`}
             >
               {holding
