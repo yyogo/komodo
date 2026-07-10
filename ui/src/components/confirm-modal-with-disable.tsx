@@ -1,5 +1,4 @@
-import { useRead } from "@/lib/hooks";
-import { ConfirmModal, ConfirmModalProps } from "mogh_ui";
+import { ConfirmModal, ConfirmModalProps } from "@/components/confirm-modal";
 
 export interface ConfirmModalWithDisableProps extends Omit<
   ConfirmModalProps,
@@ -9,6 +8,5 @@ export interface ConfirmModalWithDisableProps extends Omit<
 export default function ConfirmModalWithDisable({
   ...props
 }: ConfirmModalWithDisableProps) {
-  const disabled = useRead("GetCoreInfo", {}).data?.disable_confirm_dialog;
-  return <ConfirmModal disableModal={disabled} {...props} />;
+  return <ConfirmModal {...props} />;
 }

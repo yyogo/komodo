@@ -5,7 +5,7 @@ use colored::Colorize;
 use komodo_client::entities::{
   config::{
     DatabaseConfig,
-    core::{AwsCredentials, CoreConfig, Env},
+    core::{AwsCredentials, ConfirmationMode, CoreConfig, Env},
   },
   logger::LogConfig,
 };
@@ -354,6 +354,18 @@ pub fn core_config() -> &'static CoreConfig {
       disable_confirm_dialog: env
         .komodo_disable_confirm_dialog
         .unwrap_or(config.disable_confirm_dialog),
+      confirm_mode: env
+        .komodo_confirm_mode
+        .or_else(|| {
+          env
+            .komodo_disable_confirm_dialog
+            .filter(|disabled| *disabled)
+            .map(|_| ConfirmationMode::DoubleClick)
+        })
+        .or(config.confirm_mode),
+      confirm_hold_seconds: env
+        .komodo_confirm_hold_seconds
+        .unwrap_or(config.confirm_hold_seconds),
       disable_websocket_reconnect: env
         .komodo_disable_websocket_reconnect
         .unwrap_or(config.disable_websocket_reconnect),

@@ -86,10 +86,19 @@ private_key = "file:/config/keys/core.key"
 ## Default: false
 ui_write_disabled = false
 
-## Disables the confirm dialogs on all actions. All buttons will now be double-click.
-## Useful when only having http connection to core, as UI quick-copy button won't work.
+## How mutating actions are confirmed in the UI.
+## Options: hold, type, double_click
+## Env: KOMODO_CONFIRM_MODE
+## Default: hold
+confirm_mode = "hold"
+
+## How long the confirm button must be held when confirm_mode = "hold".
+## Env: KOMODO_CONFIRM_HOLD_SECONDS
+## Default: 3
+confirm_hold_seconds = 3
+
+## Deprecated compatibility option. When confirm_mode is omitted, true selects double_click.
 ## Env: KOMODO_DISABLE_CONFIRM_DIALOG
-## Default: false
 disable_confirm_dialog = false
 
 ## Disables UI websocket automatic reconnection.

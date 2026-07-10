@@ -2,6 +2,8 @@ use mogh_resolver::{HasResponse, Resolve};
 use serde::{Deserialize, Serialize};
 use typeshare::typeshare;
 
+use crate::entities::config::core::ConfirmationMode;
+
 mod action;
 mod alert;
 mod alerter;
@@ -138,6 +140,10 @@ pub struct GetCoreInfoResponse {
   pub disable_non_admin_create: bool,
   /// Whether confirm dialog should be disabled
   pub disable_confirm_dialog: bool,
+  /// Interaction used to confirm mutating UI actions.
+  pub confirm_mode: ConfirmationMode,
+  /// Seconds the button must be held when `confirm_mode` is `hold`.
+  pub confirm_hold_seconds: u64,
   /// Whether to disable websocket automatic reconnect.
   pub disable_websocket_reconnect: bool,
   /// Whether to enable fancy toml highlighting.

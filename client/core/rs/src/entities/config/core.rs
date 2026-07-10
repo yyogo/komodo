@@ -12,7 +12,8 @@
 use std::{collections::HashMap, path::PathBuf};
 
 use mogh_auth_client::config::NamedOauthConfig;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
+use typeshare::typeshare;
 
 use crate::{
   deserializers::option_string_list_deserializer,
@@ -132,6 +133,10 @@ pub struct Env {
   pub komodo_lock_login_credentials_for: Option<Vec<String>>,
   /// Override `disable_confirm_dialog`
   pub komodo_disable_confirm_dialog: Option<bool>,
+  /// Override `confirm_mode`
+  pub komodo_confirm_mode: Option<ConfirmationMode>,
+  /// Override `confirm_hold_seconds`
+  pub komodo_confirm_hold_seconds: Option<u64>,
   /// Override `disable_non_admin_create`
   pub komodo_disable_non_admin_create: Option<bool>,
   /// Override `disable_websocket_reconnect`
@@ -322,6 +327,27 @@ fn default_core_config_paths() -> Vec<PathBuf> {
 /// `/config/config.toml` inside the container,
 /// or simply override whichever fields you need using the environment.
 ///
+/// How the UI confirms actions that can mutate resources.
+#[typeshare]
+#[derive(
+  Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize,
+)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde(rename_all = "snake_case")]
+pub enum ConfirmationMode {
+  /// Hold the confirmation button until its countdown completes.
+  #[default]
+  Hold,
+  /// Enter the resource name in the confirmation dialog.
+  Type,
+  /// Skip the dialog and require two clicks on the action button.
+  DoubleClick,
+}
+
+fn default_confirm_hold_seconds() -> u64 {
+  3
+}
+
 /// Refer to the [example file](https://github.com/moghtech/komodo/blob/main/config/core.config.toml) for a full example.
 #[derive(Debug, Clone, Deserialize)]
 pub struct CoreConfig {
@@ -402,8 +428,19 @@ pub struct CoreConfig {
   pub ui_write_disabled: bool,
 
   /// Disable the popup confirm dialogs. All buttons will just be double click.
+  /// Deprecated: use `confirm_mode = "double_click"` instead.
   #[serde(default)]
   pub disable_confirm_dialog: bool,
+
+  /// UI confirmation interaction. Defaults to a press-and-hold button.
+  /// When unset, `disable_confirm_dialog = true` still selects double click
+  /// for backwards compatibility.
+  #[serde(default)]
+  pub confirm_mode: Option<ConfirmationMode>,
+
+  /// Seconds the confirmation button must be held in `hold` mode.
+  #[serde(default = "default_confirm_hold_seconds")]
+  pub confirm_hold_seconds: u64,
 
   /// Disable the UI websocket from automatically reconnecting.
   #[serde(default)]
@@ -897,6 +934,8 @@ impl Default for CoreConfig {
       timezone: Default::default(),
       ui_write_disabled: Default::default(),
       disable_confirm_dialog: Default::default(),
+      confirm_mode: Default::default(),
+      confirm_hold_seconds: default_confirm_hold_seconds(),
       disable_websocket_reconnect: Default::default(),
       disable_init_resources: Default::default(),
       enable_fancy_toml: Default::default(),
@@ -996,6 +1035,8 @@ impl CoreConfig {
       transparent_mode: config.transparent_mode,
       ui_write_disabled: config.ui_write_disabled,
       disable_confirm_dialog: config.disable_confirm_dialog,
+      confirm_mode: config.confirm_mode,
+      confirm_hold_seconds: config.confirm_hold_seconds,
       disable_websocket_reconnect: config.disable_websocket_reconnect,
       disable_init_resources: config.disable_init_resources,
       enable_fancy_toml: config.enable_fancy_toml,

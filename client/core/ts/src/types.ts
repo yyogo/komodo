@@ -7743,6 +7743,8 @@ export interface GetCoreInfo {
 }
 
 /** Response for [GetCoreInfo]. */
+export type ConfirmationMode = "hold" | "type" | "double_click";
+
 export interface GetCoreInfoResponse {
 	/** The title assigned to this core api. */
 	title: string;
@@ -7758,6 +7760,10 @@ export interface GetCoreInfoResponse {
 	disable_non_admin_create: boolean;
 	/** Whether confirm dialog should be disabled */
 	disable_confirm_dialog: boolean;
+	/** Interaction used to confirm mutating UI actions. */
+	confirm_mode: ConfirmationMode;
+	/** Seconds the button must be held when `confirm_mode` is `hold`. */
+	confirm_hold_seconds: number;
 	/** Whether to disable websocket automatic reconnect. */
 	disable_websocket_reconnect: boolean;
 	/** Whether to enable fancy toml highlighting. */
@@ -11143,4 +11149,3 @@ export type WsLoginMessage =
 	key: string;
 	secret: string;
 }};
-

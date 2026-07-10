@@ -10,7 +10,7 @@ use komodo_client::{
     ResourceTarget,
     build::Build,
     builder::{Builder, BuilderConfig},
-    config::{DockerRegistry, GitProvider},
+    config::{DockerRegistry, GitProvider, core::ConfirmationMode},
     permission::PermissionLevel,
     repo::Repo,
     server::Server,
@@ -350,6 +350,14 @@ impl Resolve<ReadArgs> for GetCoreInfo {
       transparent_mode: config.transparent_mode,
       ui_write_disabled: config.ui_write_disabled,
       disable_confirm_dialog: config.disable_confirm_dialog,
+      confirm_mode: config.confirm_mode.unwrap_or(
+        if config.disable_confirm_dialog {
+          ConfirmationMode::DoubleClick
+        } else {
+          ConfirmationMode::Hold
+        },
+      ),
+      confirm_hold_seconds: config.confirm_hold_seconds,
       disable_non_admin_create: config.disable_non_admin_create,
       disable_websocket_reconnect: config.disable_websocket_reconnect,
       enable_fancy_toml: config.enable_fancy_toml,
